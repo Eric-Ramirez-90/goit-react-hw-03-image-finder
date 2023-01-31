@@ -4,8 +4,8 @@ import 'react-toastify/dist/ReactToastify.css';
 import Searchbar from 'components/Searchbar/Searchbar';
 import ImageGallery from 'components/ImageGallery/ImageGallery';
 import SearchError from 'components/SearchErrorView/SearchErrorView';
-import { FidgetSpinner } from 'react-loader-spinner';
 import { ContainerApp } from './App.styled';
+import { ImageGrid } from 'components/Loader/Loader';
 
 class App extends Component {
   state = {
@@ -71,7 +71,7 @@ class App extends Component {
       <ContainerApp>
         <Searchbar getQueryName={this.handleFormSubmit} />
         {status === 'idle' && <div>Enter a search name</div>}
-        {status === 'pending' && <FidgetSpinner />}
+        {status === 'pending' && <ImageGrid />}
         {status === 'rejected' && <SearchError message={error.message} />}
         {status === 'resolved' && <ImageGallery images={images} />}
         {status === 'resolved' && (
