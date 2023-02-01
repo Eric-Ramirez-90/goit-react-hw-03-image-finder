@@ -1,12 +1,7 @@
 import { Component } from 'react';
 import { toast } from 'react-toastify';
-import {
-  Button,
-  Form,
-  Input,
-  Label,
-  SearchbarHeader,
-} from './Searchbar.styled';
+import { Button, Form, Input, SearchbarHeader } from './Searchbar.styled';
+import { FcSearch } from 'react-icons/fc';
 
 class Searchbar extends Component {
   state = {
@@ -33,7 +28,7 @@ class Searchbar extends Component {
       <SearchbarHeader>
         <Form onSubmit={this.handleSubmit}>
           <Button type="submit">
-            <Label></Label>
+            <FcSearch size="30" />
           </Button>
 
           <Input

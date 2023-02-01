@@ -6,6 +6,7 @@ import ImageGallery from 'components/ImageGallery/ImageGallery';
 import SearchError from 'components/SearchErrorView/SearchErrorView';
 import { ContainerApp } from './App.styled';
 import { ImageGrid } from 'components/Loader/Loader';
+import Button from 'components/Button/Button';
 
 class App extends Component {
   state = {
@@ -45,7 +46,10 @@ class App extends Component {
             throw new Error(`This search "${nextQuery}" is not found`);
           }
 
-          return this.setState({ images: hits, status: 'resolved' });
+          return this.setState(prevState => ({
+            images: [...prevState.images, ...hits],
+            status: 'resolved',
+          }));
         })
         .catch(error => this.setState({ error, status: 'rejected' }))
         .finally(() => this.setState({ loading: false }));
@@ -56,6 +60,7 @@ class App extends Component {
     this.setState({
       page: 1,
       searchQuery,
+      images: [],
     });
   };
 
@@ -74,13 +79,7 @@ class App extends Component {
         {status === 'pending' && <ImageGrid />}
         {status === 'rejected' && <SearchError message={error.message} />}
         {status === 'resolved' && <ImageGallery images={images} />}
-        {status === 'resolved' && (
-          <div>
-            <button type="button" onClick={this.loadMore}>
-              Load more
-            </button>
-          </div>
-        )}
+        {status === 'resolved' && <Button onClick={this.loadMore} />}
         <ToastContainer autoClose={3000} rtl />
       </ContainerApp>
     );
