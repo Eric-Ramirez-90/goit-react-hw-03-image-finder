@@ -3,8 +3,8 @@ import ContentLoader from 'react-content-loader';
 export const ImageGrid = () => (
   <ContentLoader
     speed={2}
-    width={1200}
-    height={800}
+    width={800}
+    height={600}
     viewBox="0 0 800 577"
     backgroundColor="#f3f3f3"
     foregroundColor="#ecebeb"

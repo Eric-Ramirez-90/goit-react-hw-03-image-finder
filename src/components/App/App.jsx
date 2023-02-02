@@ -7,6 +7,7 @@ import SearchError from 'components/SearchErrorView/SearchErrorView';
 import { ContainerApp } from './App.styled';
 import { ImageGrid } from 'components/Loader/Loader';
 import Button from 'components/Button/Button';
+import fetchImages from 'components/Api/service-Api';
 
 class App extends Component {
   state = {
@@ -15,6 +16,8 @@ class App extends Component {
     page: 1,
     perPage: 12,
     error: null,
+    totalHits: 0,
+    scroll: 0,
     status: 'idle',
   };
 
@@ -22,7 +25,7 @@ class App extends Component {
     const prevQuery = prevState.searchQuery;
     const nextQuery = this.state.searchQuery;
     const API_KEY = '31766486-572375a92de9bb4d66deb6c09';
-    const { page, perPage } = this.state;
+    const { page, perPage, scroll } = this.state;
 
     if (prevQuery !== nextQuery || prevState.page !== page) {
       this.setState({ status: 'pending' });
@@ -49,10 +52,18 @@ class App extends Component {
           return this.setState(prevState => ({
             images: [...prevState.images, ...hits],
             status: 'resolved',
+            totalHits: totalHits,
+            scroll: document.documentElement.scrollHeight,
           }));
         })
-        .catch(error => this.setState({ error, status: 'rejected' }))
-        .finally(() => this.setState({ loading: false }));
+        .catch(error => this.setState({ error, status: 'rejected' }));
+    }
+
+    if (prevState.scroll !== scroll && page > 1) {
+      window.scrollTo({
+        top: this.state.scroll - 260,
+        behavior: 'smooth',
+      });
     }
   }
 
@@ -71,15 +82,16 @@ class App extends Component {
   };
 
   render() {
-    const { images, error, status } = this.state;
+    const { images, error, status, totalHits } = this.state;
     return (
       <ContainerApp>
         <Searchbar getQueryName={this.handleFormSubmit} />
-        {status === 'idle' && <div>Enter a search name</div>}
         {status === 'pending' && <ImageGrid />}
         {status === 'rejected' && <SearchError message={error.message} />}
         {status === 'resolved' && <ImageGallery images={images} />}
-        {status === 'resolved' && <Button onClick={this.loadMore} />}
+        {status === 'resolved' && totalHits > 12 && (
+          <Button onClick={this.loadMore} />
+        )}
         <ToastContainer autoClose={3000} rtl />
       </ContainerApp>
     );
