@@ -1,9 +1,14 @@
 import { Component } from 'react';
 import { toast } from 'react-toastify';
+import PropTypes from 'prop-types';
 import { Button, Form, Input, SearchbarHeader } from './Searchbar.styled';
 import { FcSearch } from 'react-icons/fc';
 
 class Searchbar extends Component {
+  static propType = {
+    getQueryName: PropTypes.func.isRequired,
+  };
+
   state = {
     searchQuery: '',
   };
@@ -18,6 +23,7 @@ class Searchbar extends Component {
       toast.error('Please enter a search name');
       return;
     }
+
     this.props.getQueryName(this.state.searchQuery);
 
     this.setState({ searchQuery: '' });

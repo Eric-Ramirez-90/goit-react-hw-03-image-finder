@@ -1,4 +1,5 @@
 import errorImage from './error.jpg';
+import PropTypes from 'prop-types';
 import { Container, ErrorImage, ErrorText } from './SearchErrorView.styled';
 
 const SearchError = ({ message }) => {
@@ -11,3 +12,7 @@ const SearchError = ({ message }) => {
 };
 
 export default SearchError;
+
+SearchError.propTypes = {
+  masenge: PropTypes.string.isRequired,
+};
