@@ -14,56 +14,46 @@ class App extends Component {
     searchQuery: '',
     images: null,
     page: 1,
-    perPage: 12,
     error: null,
     totalHits: 0,
+    totalPages: 0,
     scroll: 0,
     status: 'idle',
   };
 
-  componentDidUpdate(_, prevState) {
+  async componentDidUpdate(_, prevState) {
     const prevQuery = prevState.searchQuery;
     const nextQuery = this.state.searchQuery;
-    const API_KEY = '31766486-572375a92de9bb4d66deb6c09';
-    const { page, perPage, scroll } = this.state;
+    const { page, scroll, searchQuery } = this.state;
 
     if (prevQuery !== nextQuery || prevState.page !== page) {
       this.setState({ status: 'pending' });
 
-      fetch(
-        `https://pixabay.com/api/?key=${API_KEY}&q=${nextQuery}&page=${page}&per_page=${perPage}`
-      )
-        .then(response => {
-          if (response.ok) {
-            return response.json();
-          }
+      try {
+        const images = await fetchImages(searchQuery, page);
 
-          return Promise.reject(
-            new Error(`This search "${nextQuery}" is not found`)
-          );
-        })
-        .then(images => {
-          const { hits, totalHits } = images;
+        const { hits, totalHits } = images;
 
-          if (!totalHits) {
-            throw new Error(`This search "${nextQuery}" is not found`);
-          }
+        if (!totalHits) {
+          throw new Error(`This search "${nextQuery}" is not found`);
+        }
 
-          return this.setState(prevState => ({
-            images: [...prevState.images, ...hits],
-            status: 'resolved',
-            totalHits: totalHits,
-            scroll: document.documentElement.scrollHeight,
-          }));
-        })
-        .catch(error => this.setState({ error, status: 'rejected' }));
-    }
+        return this.setState(prevState => ({
+          images: [...prevState.images, ...hits],
+          status: 'resolved',
+          totalPages: Math.round(totalHits / 12),
+          scroll: document.documentElement.scrollHeight,
+        }));
+      } catch (error) {
+        this.setState({ error, status: 'rejected' });
+      }
 
-    if (prevState.scroll !== scroll && page > 1) {
-      window.scrollTo({
-        top: this.state.scroll - 260,
-        behavior: 'smooth',
-      });
+      if (prevState.scroll !== scroll && page > 1) {
+        window.scrollTo({
+          top: this.state.scroll - 260,
+          behavior: 'smooth',
+        });
+      }
     }
   }
 
@@ -82,14 +72,15 @@ class App extends Component {
   };
 
   render() {
-    const { images, error, status, totalHits } = this.state;
+    const { images, error, status, totalPages, page } = this.state;
+
     return (
       <ContainerApp>
         <Searchbar getQueryName={this.handleFormSubmit} />
         {status === 'pending' && <ImageGrid />}
         {status === 'rejected' && <SearchError message={error.message} />}
         {status === 'resolved' && <ImageGallery images={images} />}
-        {status === 'resolved' && totalHits > 12 && (
+        {status === 'resolved' && totalPages > page && (
           <Button onClick={this.loadMore} />
         )}
         <ToastContainer autoClose={3000} rtl />
