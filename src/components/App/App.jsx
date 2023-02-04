@@ -1,14 +1,14 @@
 import { Component } from 'react';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import Searchbar from 'components/Searchbar/Searchbar';
-import ImageGallery from 'components/ImageGallery/ImageGallery';
-import SearchError from 'components/SearchErrorView/SearchErrorView';
+import Searchbar from 'components/Searchbar';
+import ImageGallery from 'components/ImageGallery';
+import SearchError from 'components/SearchErrorView';
 import { ContainerApp } from './App.styled';
-// import { ImageGrid } from 'components/Loader/Loader';
-import Button from 'components/Button/Button';
+import ImageGrid from 'components/Loader';
+import Button from 'components/Button';
 import fetchImages from 'components/Api/service-Api';
-import Loader from 'components/Loader/Loader';
+// import Loader from 'components/Loader/Loader';
 
 class App extends Component {
   state = {
@@ -16,7 +16,6 @@ class App extends Component {
     images: null,
     page: 1,
     error: null,
-    totalHits: 0,
     totalPages: 0,
     scroll: 0,
     status: 'idle',
@@ -79,7 +78,7 @@ class App extends Component {
       <ContainerApp>
         <Searchbar getQueryName={this.handleFormSubmit} />
         <ToastContainer autoClose={3000} rtl />
-        {status === 'pending' && <Loader />}
+        {status === 'pending' && <ImageGrid />}
         {status === 'rejected' && <SearchError message={error.message} />}
         {status === 'resolved' && <ImageGallery images={images} />}
         {status === 'resolved' && totalPages > page && (
