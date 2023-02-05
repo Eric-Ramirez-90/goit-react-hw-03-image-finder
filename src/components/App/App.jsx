@@ -5,10 +5,9 @@ import Searchbar from 'components/Searchbar';
 import ImageGallery from 'components/ImageGallery';
 import SearchError from 'components/SearchErrorView';
 import { ContainerApp } from './App.styled';
-import ImageGrid from 'components/Loader';
 import Button from 'components/Button';
 import fetchImages from 'components/Api/service-Api';
-// import Loader from 'components/Loader/Loader';
+import Loader from 'components/Loader/Loader';
 
 class App extends Component {
   state = {
@@ -18,6 +17,7 @@ class App extends Component {
     error: null,
     totalPages: 0,
     scroll: 0,
+    isLoading: false,
     status: 'idle',
   };
 
@@ -27,7 +27,7 @@ class App extends Component {
     const { page, scroll, searchQuery } = this.state;
 
     if (prevQuery !== nextQuery || prevState.page !== page) {
-      this.setState({ status: 'pending' });
+      this.setState({ isLoading: true });
 
       try {
         const images = await fetchImages(searchQuery, page);
@@ -38,7 +38,7 @@ class App extends Component {
           throw new Error(`This search "${nextQuery}" is not found`);
         }
 
-        this.setState(prevState => ({
+        return this.setState(prevState => ({
           images: [...prevState.images, ...hits],
           status: 'resolved',
           totalPages: Math.round(totalHits / 12),
@@ -46,12 +46,14 @@ class App extends Component {
         }));
       } catch (error) {
         this.setState({ error, status: 'rejected' });
+      } finally {
+        this.setState({ isLoading: false });
       }
     }
 
     if (prevState.scroll !== scroll && page > 1) {
       window.scrollTo({
-        top: scroll - 240,
+        top: scroll - 260,
         behavior: 'smooth',
       });
     }
@@ -72,15 +74,15 @@ class App extends Component {
   };
 
   render() {
-    const { images, error, status, totalPages, page } = this.state;
+    const { images, error, status, totalPages, page, isLoading } = this.state;
 
     return (
       <ContainerApp>
         <Searchbar getQueryName={this.handleFormSubmit} />
         <ToastContainer autoClose={3000} rtl />
-        {status === 'pending' && <ImageGrid />}
         {status === 'rejected' && <SearchError message={error.message} />}
         {status === 'resolved' && <ImageGallery images={images} />}
+        {isLoading && <Loader />}
         {status === 'resolved' && totalPages > page && (
           <Button onClick={this.loadMore} />
         )}

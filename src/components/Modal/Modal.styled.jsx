@@ -14,6 +14,6 @@ export const Overlay = styled.div`
 `;
 
 export const ModalContainer = styled.div`
-  max-width: 800px;
-  max-height: 600px;
+  max-width: 1200px;
+  max-height: 700px;
 `;

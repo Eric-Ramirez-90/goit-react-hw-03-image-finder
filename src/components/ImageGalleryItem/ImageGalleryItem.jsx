@@ -30,11 +30,7 @@ class ImageGalleryItem extends Component {
         <Image src={webformatURL} alt={tags} onClick={this.toggleModal} />
         {showModal && (
           <Modal onClose={this.toggleModal}>
-            <img
-              src={largeImageURL}
-              alt={tags}
-              onClick={this.toggleModal}
-            ></img>
+            <img src={largeImageURL} alt={tags}></img>
           </Modal>
         )}
       </>
